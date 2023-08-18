@@ -28,12 +28,36 @@ class Product {
   }
 
   updateById(id, product) {
-    //
+    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
+    // Keeping a flag
+    let flag = false;
+    const updatedData = data.map((element) => {
+      if (element.id === id) {
+        flag = true;
+        if (product.id) {
+          return { ...element, ...product, id: element.id };
+        }
+        return { ...element, ...product };
+      }
+      return element;
+    });
+
+    if (flag) {
+      fs.writeFileSync("./data/manga.json", JSON.stringify(updatedData));
+      return "Product successfully updated!", updatedData.filter((element) => element.id === id)[0];
+    }
+    return "ID was not a valid one";
   }
 
-  //   deletetById(id) {
-  //     //
-  //   }
+  deletetById(id) {
+    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
+    const updatedData = data.filter((element) => element.id !== id);
+    if (updatedData) {
+      fs.writeFileSync("./data/manga.json", JSON.stringify(updatedData));
+      return "Product successfully deletd!";
+    }
+    return "ID was not a valid one";
+  }
 }
 
 module.exports = new Product();
