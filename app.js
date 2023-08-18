@@ -1,13 +1,17 @@
-const Math = require("./math");
-const Math2 = require("./math/index2");
-const ObjectA = require("./objectA");
-const { str, str2 } = require("./fileA");
+const Product = require("./product");
 
-const classSum = Math.add(12, 10);
-const objectSum = ObjectA.add(5, 10);
+// const allProducts = ;
 
-console.log(str);
-console.log(str2);
-console.log("Sum of class method:", classSum);
-console.log("Sum of object method:", objectSum);
-Math2.myFunc();
+const main = () => {
+  //   const productObj = new Product(allProducts);
+  //   productObj.deleteProductById(8);
+  const data = Product.addProduct({
+    name: "My Hero Academia, Vol. 1",
+    price: 9.99,
+    stock: 310,
+    author: "Kohei Horikoshi",
+  });
+  console.log(data);
+};
+
+main();
