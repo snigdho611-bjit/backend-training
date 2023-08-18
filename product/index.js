@@ -1,29 +1,39 @@
 const fs = require("fs");
 
 class Product {
-  getAllData() {
-    const stream = fs.readFileSync("./data/manga.json", "utf-8");
-    return stream;
+  getAll() {
+    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
+    return data;
   }
 
-  addProduct(product) {
-    const stream = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
-    // stream.push({ ...product, id: stream[stream.length - 1].id + 1 });
-    stream.push({
-      id: stream[stream.length - 1].id + 1,
-      name: product.name,
-      price: product.price,
-      stock: product.stock,
-      author: product.author,
-    });
-    fs.writeFileSync("./data/manga.json", JSON.stringify(stream), "utf-8");
-    return stream[stream.length - 1];
+  getOneById(id) {
+    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
+    const findData = data.filter((element) => element.id === id)[0];
+    if (findData) {
+      // If data is found with the corresponding ID, then only that data will be returned
+      return findData;
+    }
+
+    // If no data is found with the corresponding ID, then this message will be returned instead
+    return "The data does not exist";
   }
 
-  deleteProductById(id) {
-    console.log("Deleting product by ID...");
-    this.data = this.data.filter((element) => element.id !== id);
+  add(product) {
+    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
+    const newData = { ...product, id: data[data.length - 1].id + 1 };
+    data.push(newData);
+    fs.writeFileSync("./data/manga.json", JSON.stringify(data));
+    console.log("Object has been successfully added");
+    return newData;
   }
+
+  updateById(id, product) {
+    //
+  }
+
+  //   deletetById(id) {
+  //     //
+  //   }
 }
 
 module.exports = new Product();

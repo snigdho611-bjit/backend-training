@@ -1,17 +1,22 @@
 const Product = require("./product");
 
-// const allProducts = ;
-
 const main = () => {
-  //   const productObj = new Product(allProducts);
-  //   productObj.deleteProductById(8);
-  const data = Product.addProduct({
+  // Get all data
+  const getAllData = Product.getAll();
+  console.log(getAllData);
+
+  // Add new data
+  const addData = Product.add({
     name: "My Hero Academia, Vol. 1",
     price: 9.99,
-    stock: 310,
-    author: "Kohei Horikoshi",
+    stock: 42,
+    author: "John Doe",
   });
-  console.log(data);
+  console.log("Adding data", addData);
+
+  // Get one data by ID
+  const getOneByIdData = Product.getOneById(11);
+  console.log("Getting data with specific ID", getOneByIdData);
 };
 
 main();
