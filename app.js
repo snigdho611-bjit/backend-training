@@ -1,13 +1,12 @@
-const Math = require("./math");
-const Math2 = require("./math/index2");
-const ObjectA = require("./objectA");
-const { str, str2 } = require("./fileA");
+var http = require("http");
 
-const classSum = Math.add(12, 10);
-const objectSum = ObjectA.add(5, 10);
-
-console.log(str);
-console.log(str2);
-console.log("Sum of class method:", classSum);
-console.log("Sum of object method:", objectSum);
-Math2.myFunc();
+// create a server object:
+http
+  .createServer(function (req, res) {
+    if (req.url === "/") {
+      res.writeHead(200, { "Content-Type": "text/json" });
+      res.write(JSON.stringify({ message: "Hello World!" }));
+      return res.end();
+    }
+  })
+  .listen(8080);
