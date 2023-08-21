@@ -1,0 +1,23 @@
+{
+  "name": "backend-training",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snigdho611-bjit/backend-training.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/snigdho611-bjit/backend-training/issues"
+  },
+  "homepage": "https://github.com/snigdho611-bjit/backend-training#readme"
+}
