@@ -44,7 +44,14 @@ class Product {
 
     if (flag) {
       fs.writeFileSync("./data/manga.json", JSON.stringify(updatedData));
+<<<<<<< HEAD
       return "Product successfully updated!", updatedData.filter((element) => element.id === id)[0];
+=======
+      return (
+        "Product successfully updated!",
+        updatedData.filter((element) => element.id === id)[0]
+      );
+>>>>>>> 6-http-modules
     }
     return "ID was not a valid one";
   }
