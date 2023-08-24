@@ -59,7 +59,7 @@ class Product {
         jsonData.push(JSON.parse(product));
         return fsPromise
           .writeFile(path.join(__dirname, "..", "data", "products.json"), JSON.stringify(jsonData))
-          .then((data) => {
+          .then(() => {
             return { success: true };
           })
           .catch((err) => {

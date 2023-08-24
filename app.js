@@ -21,13 +21,15 @@ const server = http.createServer(function (req, res) {
 
     const requestURL = req.url.split("?")[0];
 
-    //Get All Products
+    // Get All Products
     if (requestURL === "/products/all" && req.method === "GET") {
       try {
         const result = await Product.getAll();
         if (result.success) {
           res.writeHead(200);
-          res.write(success("Successfully got all products", JSON.parse(result.data)));
+          res.write(
+            success("Successfully got all products", JSON.parse(result.data))
+          );
           return res.end();
         } else {
           res.writeHead(400);
@@ -60,16 +62,25 @@ const server = http.createServer(function (req, res) {
         res.write(failure("Internal server error"));
         return res.end();
       }
-    } else if (requestURL === "/products/detail" && req.method === "GET") {
+    }
+    // Get One Product By Id
+    else if (requestURL === "/products/detail" && req.method === "GET") {
       try {
-        const result = await Product.getOneById(getQueryParams().id);
-        if (result.success) {
-          res.writeHead(200);
-          res.write(success("Found data successfully", result.data));
-          res.end();
+        const id = getQueryParams().id;
+        if (id) {
+          const result = await Product.getOneById(getQueryParams().id);
+          if (result.success) {
+            res.writeHead(200);
+            res.write(success("Found data successfully", result.data));
+            res.end();
+          } else {
+            res.writeHead(200);
+            res.write(success("Product with id does not exist"));
+            return res.end();
+          }
         } else {
-          res.writeHead(400);
-          res.write(failure("Could not find data"));
+          res.writeHead(404);
+          res.write(failure("Id was not provided"));
           return res.end();
         }
       } catch (error) {
