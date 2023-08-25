@@ -17,7 +17,6 @@ class Product {
   }
 
   async getOneById(id) {
-    // const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
     return fsPromise
       .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
       .then((data) => {
@@ -37,8 +36,7 @@ class Product {
       errors.title = "Title was not provided";
     }
     if (!description || description === "" || description.length <= 10) {
-      errors.description =
-        "Description should be provided, and it should be at least 15 characters long";
+      errors.description = "Description should be provided, and it should be at least 15 characters long";
     }
     if (!price || price <= 100) {
       errors.price = "Price should be provided, and it should be at least 100";
@@ -56,7 +54,9 @@ class Product {
       .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
       .then((data) => {
         const jsonData = JSON.parse(data);
-        jsonData.push(JSON.parse(product));
+        const newProduct = JSON.parse(product);
+        newProduct.id = jsonData[jsonData.length - 1].id + 1;
+        jsonData.push(newProduct);
         return fsPromise
           .writeFile(path.join(__dirname, "..", "data", "products.json"), JSON.stringify(jsonData))
           .then(() => {
@@ -93,14 +93,17 @@ class Product {
     return "ID was not a valid one";
   }
 
-  deletetById(id) {
-    const data = JSON.parse(fs.readFileSync("./data/manga.json", "utf-8"));
-    const updatedData = data.filter((element) => element.id !== id);
-    if (updatedData) {
-      fs.writeFileSync("./data/manga.json", JSON.stringify(updatedData));
-      return "Product successfully deletd!";
-    }
-    return "ID was not a valid one";
+  async deletetById(id) {
+    return fsPromise
+      .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
+      .then((data) => {
+        const findData = JSON.parse(data).filter((element) => element.id === Number(id))[0];
+        if (findData) {
+          return { success: true, data: findData };
+        } else {
+          return { success: false };
+        }
+      });
   }
 }
 
