@@ -75,7 +75,7 @@ class Product {
       });
   }
 
-  updateById(id, product) {
+  async updateById(id, product) {
     // const data = JSON.parse(fs.readFileSync("./data/products.json", "utf-8"));
     const { title, description, price, rating, stock } = JSON.parse(product);
     let flag = false;
@@ -120,7 +120,6 @@ class Product {
         return fsPromise
           .writeFile(path.join(__dirname, "..", "data", "products.json"), JSON.stringify(updatedData))
           .then(() => {
-            console.log("first");
             return { success: true };
           })
           .catch((err) => {
