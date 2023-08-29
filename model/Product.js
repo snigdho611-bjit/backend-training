@@ -8,11 +8,11 @@ class Product {
     return fsPromise
       .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
       .then((data) => {
-        return { success: true, data: data };
+        return JSON.parse(data);
       })
       .catch((error) => {
         console.log(error);
-        return { success: false };
+        return [];
       });
   }
 
@@ -21,7 +21,6 @@ class Product {
       .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
       .then((data) => {
         const findData = JSON.parse(data).filter((element) => {
-          console.log(id);
           return element.id === Number(id);
         })[0];
         if (findData) {
@@ -33,31 +32,11 @@ class Product {
   }
 
   async add(product) {
-    const { title, description, price, rating, stock } = JSON.parse(product);
-    const errors = {};
-    if (!title || title === "") {
-      errors.title = "Title was not provided";
-    }
-    if (!description || description === "" || description.length <= 10) {
-      errors.description = "Description should be provided, and it should be at least 15 characters long";
-    }
-    if (!price || price <= 100) {
-      errors.price = "Price should be provided, and it should be at least 100";
-    }
-    if (!rating || rating > 5 || rating < 0) {
-      errors.rating = "Rating should be provided between 0 and 5";
-    }
-    if (!stock || stock === 0) {
-      errors.stock = "Stock should be provided greater than 0";
-    }
-    if (Object.keys(errors).length > 0) {
-      return { success: false, errors: errors };
-    }
     return fsPromise
       .readFile(path.join(__dirname, "..", "data", "products.json"), { encoding: "utf-8" })
       .then((data) => {
         const jsonData = JSON.parse(data);
-        const newProduct = JSON.parse(product);
+        const newProduct = product;
         newProduct.id = jsonData[jsonData.length - 1].id + 1;
         jsonData.push(newProduct);
         return fsPromise
