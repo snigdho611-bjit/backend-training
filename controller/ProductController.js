@@ -1,5 +1,6 @@
+const { validationResult } = require("express-validator");
 const ProductModel = require("../model/Product");
-const { success } = require("../util/common");
+const { success, failure } = require("../util/common");
 
 class Product {
   async getAll(req, res) {
@@ -27,12 +28,18 @@ class Product {
 
   async create(req, res) {
     try {
-      const product = req.body;
-      const result = await ProductModel.add(product);
-      if (result.success) {
-        return res.status(200).send(success("Successfully added the product", product.data));
+      const validation = validationResult(req).array();
+      console.log(validation);
+      if (validation.length === 0) {
+        const product = req.body;
+        const result = await ProductModel.add(product);
+        if (result.success) {
+          return res.status(200).send(success("Successfully added the product", product.data));
+        } else {
+          return res.status(200).send(failure("Failed to add the product"));
+        }
       } else {
-        return res.status(200).send(failure("Failed to add the product"));
+        return res.status(422).send(failure("Invalid inputs provided", validation));
       }
     } catch (error) {
       return res.status(500).send(failure("Internal server error"));
