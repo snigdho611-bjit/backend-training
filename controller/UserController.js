@@ -5,11 +5,7 @@ const UserModel = require("../model/User");
 class UserController {
   async getAll(req, res) {
     try {
-      const users = await UserModel.find({});
-      if (users.length > 0) {
-        return res.status(200).send(success("Successfully received all users", { result: users, total: users.length }));
-      }
-      return res.status(200).send(success("No users were found"));
+      // Write your code here
     } catch (error) {
       console.log(error);
       return res.status(500).send(failure("Internal server error"));
@@ -18,13 +14,7 @@ class UserController {
 
   async getOneById(req, res) {
     try {
-      const { id } = req.params;
-      const user = await UserModel.findById({ _id: id });
-      if (user) {
-        return res.status(200).send(success("Successfully received the user", user));
-      } else {
-        return res.status(200).send(failure("Failed to received the user"));
-      }
+      // Write your code here
     } catch (error) {
       console.log(error);
       return res.status(500).send(failure("Internal server error"));
