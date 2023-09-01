@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const UserRouter = require("./routes/User");
+const ProductRouter = require("./routes/Product");
+const TransactionRouter = require("./routes/Transaction");
 const dotenv = require("dotenv");
 const databaseConnection = require("./config/database");
 
@@ -12,11 +14,12 @@ app.use(express.json()); // Parses data as JSON
 app.use(express.text()); // Parses data as text
 app.use(express.urlencoded({ extended: true })); // Parses data as urlencoded
 
-// app.use("/products", ProductRouter);
+app.use("/products", ProductRouter);
+app.use("/transactions", TransactionRouter);
 app.use("/users", UserRouter);
 
 databaseConnection(() => {
-  app.listen(8000, () => {
-    console.log("Server is running on port 8000");
-  });
+    app.listen(8000, () => {
+        console.log("Server is running on port 8000");
+    });
 });

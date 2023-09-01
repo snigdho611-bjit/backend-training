@@ -1,33 +1,49 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Username was not provided"],
-    maxLength: 30,
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: [true, "Email was not provided"],
-  },
-  rank: {
-    type: Number,
-    default: 1,
-    min: 1,
-    max: 10,
-  },
-  createdAt: {
-    type: Date,
-    required: false,
-    default: new Date(),
-  },
-  status: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-});
+const userSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+            maxLength: 30,
+        },
+        email: {
+            type: String,
+            required: true,
+        },
+        role: {
+            type: Number, // 1 = admin, 2 = regular
+            required: false,
+            default: 2,
+        },
+        phone: {
+            type: String,
+            required: false,
+        },
+        address: {
+            house: String,
+            road: String,
+            area: {
+                type: String,
+                required: true,
+            },
+            city: {
+                type: String,
+                required: true,
+            },
+            country: {
+                type: String,
+                required: true,
+            },
+        },
+        verified: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+    },
+    { timestamps: true }
+);
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
