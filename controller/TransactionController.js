@@ -46,6 +46,8 @@ class Transaction {
             const productsList = products.map((element) => {
                 return element.product;
             });
+
+            // Checking if all products in list from body are actually present in database
             const productsInCart = await ProductModel.find({
                 _id: {
                     $in: productsList,
@@ -53,10 +55,12 @@ class Transaction {
             }).select("price");
             let totalPrice = 0;
 
+            // If any of the product id is invalid, this length will fail to match
             if (productsInCart.length !== products.length) {
                 return res.status(HTTP_STATUS.OK).send(failure("All the IDs are not valid IDs"));
             }
 
+            // Calculating total price
             totalPrice = productsInCart.reduce((accumulator, current, i) => {
                 return accumulator + current.price * products[i].quantity;
             }, 0);
