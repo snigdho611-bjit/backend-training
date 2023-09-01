@@ -10,9 +10,7 @@ class Transaction {
             const { detail } = req.query;
             let transactions;
             if (detail && detail != "1") {
-                return res
-                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
-                    .send(failure("Invalid parameter sent"));
+                return res.status(HTTP_STATUS.UNPROCESSABLE_ENTITY).send(failure("Invalid parameter sent"));
             }
 
             if (detail === "1") {
@@ -34,9 +32,7 @@ class Transaction {
             return res.status(HTTP_STATUS.OK).send(success("No transactions were found"));
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(failure("Internal server error"));
         }
     }
 
@@ -81,9 +77,7 @@ class Transaction {
             return res.status(HTTP_STATUS.OK).send(failure("Failed to add transaction"));
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(failure("Internal server error"));
         }
     }
 }
