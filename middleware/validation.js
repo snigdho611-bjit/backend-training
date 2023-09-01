@@ -25,6 +25,24 @@ const userValidator = {
       .bail()
       .isEmail()
       .withMessage("Email format is incorrect"),
+    body("address.area")
+      .exists()
+      .withMessage("Area was not provided")
+      .bail()
+      .isString()
+      .withMessage("Area must be a string"),
+    body("address.city")
+      .exists()
+      .withMessage("City was not provided")
+      .bail()
+      .isString()
+      .withMessage("City must be a string"),
+    body("address.country")
+      .exists()
+      .withMessage("Country was not provided")
+      .bail()
+      .isString()
+      .withMessage("Country must be a string"),
   ],
 };
 
