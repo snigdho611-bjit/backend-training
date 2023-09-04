@@ -4,6 +4,7 @@ const app = express();
 const UserRouter = require("./routes/User");
 const ProductRouter = require("./routes/Product");
 const TransactionRouter = require("./routes/Transaction");
+const AuthRouter = require("./routes/Auth");
 const dotenv = require("dotenv");
 const databaseConnection = require("./config/database");
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true })); // Parses data as urlencoded
 app.use("/products", ProductRouter);
 app.use("/transactions", TransactionRouter);
 app.use("/users", UserRouter);
+app.use("/auth", AuthRouter);
 
 databaseConnection(() => {
     app.listen(8000, () => {

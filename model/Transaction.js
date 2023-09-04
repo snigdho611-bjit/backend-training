@@ -8,10 +8,19 @@ const transactionSchema = new mongoose.Schema(
             required: true,
         },
         products: {
-            type: [mongoose.Types.ObjectId],
-            ref: "Product",
-            required: true,
+            type: [
+                {
+                    product: {
+                        type: mongoose.Types.ObjectId,
+                        ref: "Product",
+                        required: true,
+                    },
+                    quantity: Number,
+                    _id: false,
+                },
+            ],
         },
+        total: Number,
     },
     { timestamps: true }
 );

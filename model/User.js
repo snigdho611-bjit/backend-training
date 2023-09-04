@@ -11,11 +11,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        role: {
-            type: Number, // 1 = admin, 2 = regular
-            required: false,
-            default: 2,
-        },
         phone: {
             type: String,
             required: false,
@@ -36,10 +31,9 @@ const userSchema = new mongoose.Schema(
                 required: true,
             },
         },
-        verified: {
-            type: Boolean,
+        preferredItems: {
+            type: [String],
             required: false,
-            default: false,
         },
     },
     { timestamps: true }
