@@ -15,6 +15,12 @@ class Product {
             return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(failure("Internal server error"));
         }
     }
+
+    async create(req, res) {
+        try {
+            // Add product logic
+        } catch (error) {}
+    }
 }
 
 module.exports = new Product();

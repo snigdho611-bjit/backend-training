@@ -4,6 +4,7 @@ const { failure, success } = require("../util/common");
 const bcrypt = require("bcrypt");
 const Auth = require("../model/Auth");
 const User = require("../model/User");
+const jsonwebtoken = require("jsonwebtoken");
 
 class AuthController {
     async login(req, res) {
@@ -11,6 +12,7 @@ class AuthController {
         const auth = await Auth.findOne({ email: email })
             .populate("user", "-createdAt -updatedAt")
             .select("-createdAt -updatedAt");
+        // console.log({ ...auth });
         if (!auth) {
             return res.status(HTTP_STATUS.OK).send(failure("User is not registered"));
         }
@@ -21,7 +23,10 @@ class AuthController {
         }
         const responseAuth = auth.toObject();
         delete responseAuth.password;
-        delete responseAuth._id;
+
+        const jwt = jsonwebtoken.sign(responseAuth, process.env.SECRET_KEY, { expiresIn: "1h" });
+
+        responseAuth.token = jwt;
         return res.status(HTTP_STATUS.OK).send(success("Successfully logged in", responseAuth));
     }
     async signup(req, res) {
