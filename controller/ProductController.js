@@ -6,7 +6,7 @@ const { success, failure } = require("../util/common");
 class Product {
     async getAll(req, res) {
         try {
-            const allProducts = await ProductModel.find({}).sort({ title: 1 });
+            const allProducts = await ProductModel.find({}).sort({ createdAt: -1 });
             if (allProducts.length === 0) {
                 return res.status(HTTP_STATUS.NOT_FOUND).send(failure("No products were found"));
             }
@@ -24,6 +24,13 @@ class Product {
                 return res.status(HTTP_STATUS.OK).send(failure("Failed to add the product", validation));
             }
             const { title, description, price, stock, brand } = req.body;
+
+            const existingProduct = await ProductModel.findOne({ title: title });
+
+            if (existingProduct) {
+                return res.status(HTTP_STATUS.NOT_FOUND).send(failure("Product with same title already exists"));
+            }
+
             const newProduct = await ProductModel.create({
                 title: title,
                 description: description,
