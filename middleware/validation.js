@@ -53,7 +53,19 @@ const productValidator = {
             .withMessage("Product title must be provided")
             .bail()
             .isString()
-            .withMessage("Product title must be a string"),
+            .withMessage("Product title must be a string")
+            .bail()
+            .isLength({ min: 10 })
+            .withMessage("Product title must be at least 10 characters long"),
+        body("description")
+            .exists()
+            .withMessage("Product description must be provided")
+            .bail()
+            .isString()
+            .withMessage("Product description must be a string")
+            .bail()
+            .isLength({ min: 30 })
+            .withMessage("Product description must be at least 30 characters long"),
         body("price")
             .exists()
             .withMessage("Product price must be provided")
@@ -61,7 +73,7 @@ const productValidator = {
             .isNumeric()
             .withMessage("Product price must be a number")
             .bail()
-            .isLength({ min: 0 })
+            .isFloat({ min: 1 })
             .withMessage("Product price must be greater than 0"),
         body("stock")
             .exists()
@@ -70,8 +82,14 @@ const productValidator = {
             .isNumeric()
             .withMessage("Product stock must be a number")
             .bail()
-            .isLength({ min: 0 })
+            .isInt({ min: 1 })
             .withMessage("Product stock must be greater than 0"),
+        body("brand")
+            .exists()
+            .withMessage("Product stock must be provided")
+            .bail()
+            .isString()
+            .withMessage("Product brand must be a string"),
     ],
 };
 
