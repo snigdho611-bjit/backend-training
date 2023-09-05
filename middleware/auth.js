@@ -2,7 +2,7 @@ const HTTP_STATUS = require("../constants/statusCodes");
 const { failure } = require("../util/common");
 const jsonwebtoken = require("jsonwebtoken");
 
-const isAuthorized = (req, res, next) => {
+const isAuthenticated = (req, res, next) => {
     try {
         if (!req.headers.authorization) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).send(failure("Unauthorized access"));
@@ -41,4 +41,4 @@ const isAdmin = (req, res, next) => {
     }
 };
 
-module.exports = { isAuthorized, isAdmin };
+module.exports = { isAuthenticated, isAdmin };
