@@ -3,21 +3,113 @@ const HTTP_STATUS = require("../constants/statusCodes");
 const ProductModel = require("../model/Product");
 const { success, failure } = require("../util/common");
 
+const filterRun = (param, cutoff, value) => {
+    if (!value) {
+        return {};
+    }
+
+    if (param) {
+        if (cutoff === "min") {
+            return { [param]: { $lte: parseFloat(value) } };
+        } else {
+            return { [param]: { $gte: parseFloat(value) } };
+        }
+    }
+    return {};
+};
 class Product {
     async getAll(req, res) {
         try {
-            const allProducts = await ProductModel.find({}).sort({ createdAt: -1 });
-            if (allProducts.length === 0) {
+            const {
+                sortParam,
+                sortOrder,
+                search,
+                brand,
+                category,
+                price,
+                priceFil,
+                stock,
+                stockFil,
+                rating,
+                ratingFil,
+                page,
+                limit,
+            } = req.query;
+            if (page < 1 || limit < 0) {
+                return res
+                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
+                    .send(failure("Page and limit values must be at least 1"));
+            }
+            if (
+                (sortOrder && !sortParam) ||
+                (!sortOrder && sortParam) ||
+                (sortParam &&
+                    sortParam !== "title" &&
+                    sortParam !== "discountPercentage" &&
+                    sortParam !== "rating" &&
+                    sortParam !== "stock" &&
+                    sortParam !== "price") ||
+                (sortOrder && sortOrder !== "asc" && sortOrder !== "desc")
+            ) {
+                return res
+                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
+                    .send(failure("Invalid sort parameters provided"));
+            }
+            const filter = {};
+
+            if (price && priceFil) {
+                if (priceFil === "low") {
+                    filter.price = { $lte: parseFloat(price) };
+                } else {
+                    filter.price = { $gte: parseFloat(price) };
+                }
+            }
+            if (stock && stockFil) {
+                if (stockFil === "low") {
+                    filter.stock = { $lte: parseFloat(stock) };
+                } else {
+                    filter.stock = { $gte: parseFloat(stock) };
+                }
+            }
+            if (rating && ratingFil) {
+                if (ratingFil === "low") {
+                    filter.rating = { $lte: parseFloat(rating) };
+                } else {
+                    filter.rating = { $gte: parseFloat(rating) };
+                }
+            }
+            if (brand) {
+                filter.brand = { $regex: brand, $options: "i" };
+            }
+            if (category) {
+                filter.category = { $in: category.toLowerCase() };
+            }
+            if (search) {
+                filter["$or"] = [
+                    { description: { $regex: search, $options: "i" } },
+                    { title: { $regex: search, $options: "i" } },
+                ];
+            }
+            const productCount = await ProductModel.find({}).count();
+            const products = await ProductModel.find(filter)
+                .sort({
+                    [sortParam]: sortOrder === "asc" ? 1 : -1,
+                })
+                .skip((page - 1) * limit)
+                .limit(limit ? limit : 100);
+            if (products.length === 0) {
                 return res.status(HTTP_STATUS.NOT_FOUND).send(failure("No products were found"));
             }
-            return res
-                .status(HTTP_STATUS.OK)
-                .send(
-                    success("Successfully got all products", {
-                        products: allProducts,
-                        total: allProducts.length,
-                    })
-                );
+
+            return res.status(HTTP_STATUS.OK).send(
+                success("Successfully got all products", {
+                    total: productCount,
+                    count: products.length,
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    products: products,
+                })
+            );
         } catch (error) {
             console.log(error);
             return res
