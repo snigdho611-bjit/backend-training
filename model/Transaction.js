@@ -20,7 +20,12 @@ const transactionSchema = new mongoose.Schema(
                 },
             ],
         },
-        total: Number,
+        total: { type: Number, required: true },
+        paymentMethod: {
+            type: String,
+            required: true,
+            default: "online",
+        },
     },
     { timestamps: true }
 );
