@@ -1,10 +1,10 @@
-const { validationResult } = require("express-validator");
 const { success, failure } = require("../util/common");
 const TransactionModel = require("../model/Transaction");
+const CartModel = require("../model/Cart");
 const ProductModel = require("../model/Product");
 const HTTP_STATUS = require("../constants/statusCodes");
 
-class Transaction {
+class TransactionController {
     async getAll(req, res) {
         try {
             const { detail } = req.query;
@@ -42,43 +42,70 @@ class Transaction {
 
     async create(req, res) {
         try {
-            const { user, products } = req.body;
-            const productsList = products.map((element) => {
+            const { userId, cartId } = req.body;
+            const cart = await CartModel.findOne({ _id: cartId, user: userId });
+
+            if (!cart) {
+                return res
+                    .status(HTTP_STATUS.NOT_FOUND)
+                    .send(failure("Cart was not found for this user"));
+            }
+            const productsList = cart.products.map((element) => {
                 return element.product;
             });
 
-            // Checking if all products in list from body are actually present in database
             const productsInCart = await ProductModel.find({
                 _id: {
                     $in: productsList,
                 },
-            }).select("price");
-            let totalPrice = 0;
-
-            // If any of the product id is invalid, this length will fail to match
-            if (productsInCart.length !== products.length) {
-                return res.status(HTTP_STATUS.OK).send(failure("All the IDs are not valid IDs"));
-            }
-
-            // Calculating total price
-            totalPrice = productsInCart.reduce((accumulator, current, i) => {
-                return accumulator + current.price * products[i].quantity;
-            }, 0);
-
-            const newTransaction = await TransactionModel.create({
-                user: user,
-                products: products,
-                total: totalPrice,
             });
 
-            if (newTransaction) {
-                return res.status(HTTP_STATUS.OK).send(
-                    success("Successfully created new transaction", {
-                        result: newTransaction,
-                    })
-                );
+            if (productsList.length !== productsInCart.length) {
+                return res
+                    .status(HTTP_STATUS.NOT_FOUND)
+                    .send(failure("All products in cart do not exist"));
             }
-            return res.status(HTTP_STATUS.OK).send(failure("Failed to add transaction"));
+
+            productsInCart.forEach((product) => {
+                const productFound = cart.products.findIndex(
+                    (cartItem) => String(cartItem.product._id) === String(product._id)
+                );
+                if (product.stock < cart.products[productFound].quantity) {
+                    return res
+                        .status(HTTP_STATUS.NOT_FOUND)
+                        .send(failure("Unable to check out at this time, product does not exist"));
+                }
+                product.stock -= cart.products[productFound].quantity;
+            });
+
+            const bulk = [];
+            productsInCart.map((element) => {
+                bulk.push({
+                    updateOne: {
+                        filter: { _id: element },
+                        update: { $set: { stock: element.stock } },
+                    },
+                });
+            });
+
+            const stockSave = await ProductModel.bulkWrite(bulk);
+            const newTransaction = await TransactionModel.create({
+                products: cart.products,
+                user: userId,
+                total: cart.total,
+            });
+
+            cart.products = [];
+            cart.total = 0;
+            const cartSave = await cart.save();
+
+            if (cartSave && stockSave && newTransaction) {
+                return res
+                    .status(HTTP_STATUS.OK)
+                    .send(success("Successfully checked out!", newTransaction));
+            }
+
+            return res.status(HTTP_STATUS.OK).send(failure("Something went wrong"));
         } catch (error) {
             console.log(error);
             return res
@@ -88,4 +115,4 @@ class Transaction {
     }
 }
 
-module.exports = new Transaction();
+module.exports = new TransactionController();
