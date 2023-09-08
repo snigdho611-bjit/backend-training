@@ -3,21 +3,7 @@ const HTTP_STATUS = require("../constants/statusCodes");
 const ProductModel = require("../model/Product");
 const { success, failure } = require("../util/common");
 
-const filterRun = (param, cutoff, value) => {
-    if (!value) {
-        return {};
-    }
-
-    if (param) {
-        if (cutoff === "min") {
-            return { [param]: { $lte: parseFloat(value) } };
-        } else {
-            return { [param]: { $gte: parseFloat(value) } };
-        }
-    }
-    return {};
-};
-class Product {
+class ProductController {
     async getAll(req, res) {
         try {
             const {
@@ -158,4 +144,4 @@ class Product {
     }
 }
 
-module.exports = new Product();
+module.exports = new ProductController();
