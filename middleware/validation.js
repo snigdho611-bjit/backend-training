@@ -1,4 +1,5 @@
 const { body, query, param } = require("express-validator");
+const { isValidObjectId } = require("mongoose");
 
 const userValidator = {
     // create: [
@@ -93,6 +94,29 @@ const productValidator = {
     ],
 };
 
+const cartValidator = {
+    addRemoveItemCart: [
+        body("userId")
+            .exists()
+            .withMessage("User ID must be provided")
+            .bail()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("ID is not in valid mongoDB format"),
+        body("productId")
+            .exists()
+            .withMessage("Product ID must be provided")
+            .bail()
+            .matches(/^[a-f\d]{24}$/i)
+            .withMessage("ID is not in valid mongoDB format"),
+        body("amount")
+            .exists()
+            .withMessage("Product quantity must be provided")
+            .bail()
+            .isInt({ min: 1 })
+            .withMessage("Quantity must be one or above"),
+    ],
+};
+
 const authValidator = {
     signup: [
         body("name")
@@ -170,4 +194,4 @@ const authValidator = {
     ],
 };
 
-module.exports = { userValidator, authValidator, productValidator };
+module.exports = { userValidator, authValidator, productValidator, cartValidator };
