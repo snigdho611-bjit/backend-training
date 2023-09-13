@@ -1,6 +1,5 @@
 const { validationResult } = require("express-validator");
 const HTTP_STATUS = require("../constants/statusCodes");
-const { failure, success } = require("../util/common");
 const bcrypt = require("bcrypt");
 const Auth = require("../model/Auth");
 const User = require("../model/User");
@@ -12,14 +11,13 @@ class AuthController {
         const auth = await Auth.findOne({ email: email })
             .populate("user", "-createdAt -updatedAt")
             .select("-createdAt -updatedAt");
-        // console.log({ ...auth });
         if (!auth) {
-            return res.status(HTTP_STATUS.OK).send(failure("User is not registered"));
+            return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "User is not registered");
         }
         const checkPassword = await bcrypt.compare(password, auth.password);
 
         if (!checkPassword) {
-            return res.status(HTTP_STATUS.OK).send(failure("Invalid credentials"));
+            return sendResponse(res, HTTP_STATUS.UNAUTHORIZED, "Invalid credentials");
         }
         const responseAuth = auth.toObject();
         delete responseAuth.password;
@@ -27,18 +25,19 @@ class AuthController {
         const jwt = jsonwebtoken.sign(responseAuth, process.env.SECRET_KEY, { expiresIn: "1h" });
 
         responseAuth.token = jwt;
-        return res.status(HTTP_STATUS.OK).send(success("Successfully logged in", responseAuth));
+        return sendResponse(res, HTTP_STATUS.OK, "Successfully added product", newProduct);
     }
+
     async signup(req, res) {
         try {
             const validation = validationResult(req).array();
             if (validation.length > 0) {
-                return res.status(HTTP_STATUS.OK).send(failure("Failed to add the user", validation));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the user");
             }
             const { name, email, password, phone, address, role } = req.body;
             const auth = await Auth.findOne({ email: email });
             if (auth) {
-                return res.status(HTTP_STATUS.OK).send(failure("Email is already registered"));
+                return sendResponse(res, HTTP_STATUS.CONFLICT, "Email is already registered");
             }
 
             const hashedPassword = await bcrypt.hash(password, 10).then((hash) => {
@@ -58,13 +57,13 @@ class AuthController {
                 role: role,
             });
             if (!result) {
-                return res.status(HTTP_STATUS.OK).send(failure("Failed to add the user"));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the user");
             }
 
-            return res.status(HTTP_STATUS.OK).send(success("Successfully signed up", user));
+            return sendResponse(res, HTTP_STATUS.OK, "Successfully signed up", user);
         } catch (error) {
             console.log(error);
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 }

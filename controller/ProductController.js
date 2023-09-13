@@ -1,7 +1,8 @@
 const { validationResult } = require("express-validator");
 const HTTP_STATUS = require("../constants/statusCodes");
 const ProductModel = require("../model/Product");
-const { success, failure } = require("../util/common");
+const { sendResponse } = require("../util/common");
+// const { success, failure } = require("../util/common");
 
 class ProductController {
     async getAll(req, res) {
@@ -22,9 +23,7 @@ class ProductController {
                 limit,
             } = req.query;
             if (page < 1 || limit < 0) {
-                return res
-                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
-                    .send(failure("Page and limit values must be at least 1"));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Page and limit values must be at least 1");
             }
             if (
                 (sortOrder && !sortParam) ||
@@ -37,9 +36,7 @@ class ProductController {
                     sortParam !== "price") ||
                 (sortOrder && sortOrder !== "asc" && sortOrder !== "desc")
             ) {
-                return res
-                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
-                    .send(failure("Invalid sort parameters provided"));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Invalid sort parameters provided");
             }
             const filter = {};
 
@@ -84,23 +81,19 @@ class ProductController {
                 .skip((page - 1) * limit)
                 .limit(limit ? limit : 100);
             if (products.length === 0) {
-                return res.status(HTTP_STATUS.NOT_FOUND).send(failure("No products were found"));
+                return sendResponse(res, HTTP_STATUS.NOT_FOUND, "No products were found");
             }
 
-            return res.status(HTTP_STATUS.OK).send(
-                success("Successfully got all products", {
-                    total: productCount,
-                    count: products.length,
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    products: products,
-                })
-            );
+            return sendResponse(res, HTTP_STATUS.OK, "Successfully got all products", {
+                total: productCount,
+                count: products.length,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                products: products,
+            });
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
@@ -108,18 +101,14 @@ class ProductController {
         try {
             const validation = validationResult(req).array();
             if (validation.length > 0) {
-                return res
-                    .status(HTTP_STATUS.OK)
-                    .send(failure("Failed to add the product", validation));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the product", validation);
             }
             const { title, description, price, stock, brand } = req.body;
 
             const existingProduct = await ProductModel.findOne({ title: title });
 
             if (existingProduct) {
-                return res
-                    .status(HTTP_STATUS.NOT_FOUND)
-                    .send(failure("Product with same title already exists"));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Product with same title already exists");
             }
 
             const newProduct = await ProductModel.create({
@@ -131,15 +120,10 @@ class ProductController {
             });
             console.log(newProduct);
             if (newProduct) {
-                return res
-                    .status(HTTP_STATUS.OK)
-                    .send(success("Successfully added product", newProduct));
+                return sendResponse(res, HTTP_STATUS.OK, "Successfully added product", newProduct);
             }
         } catch (error) {
-            console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 }

@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const { success, failure } = require("../util/common");
+const { success, failure, sendResponse } = require("../util/common");
 const UserModel = require("../model/User");
 const HTTP_STATUS = require("../constants/statusCodes");
 
@@ -8,19 +8,18 @@ class UserController {
         try {
             const users = await UserModel.find({});
             if (users.length > 0) {
-                return res.status(HTTP_STATUS.OK).send(
-                    success("Successfully received all users", {
-                        result: users,
-                        total: users.length,
-                    })
-                );
+                return sendResponse(res, HTTP_STATUS.OK, "Successfully received all users", {
+                    result: users,
+                    total: users.length,
+                });
             }
-            return res.status(HTTP_STATUS.OK).send(success("No users were found"));
+            return sendResponse(res, HTTP_STATUS.OK, "No users were found", {
+                result: users,
+                total: users.length,
+            });
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
@@ -29,17 +28,13 @@ class UserController {
             const { id } = req.params;
             const user = await UserModel.findById({ _id: id });
             if (user) {
-                return res
-                    .status(HTTP_STATUS.OK)
-                    .send(success("Successfully received the user", user));
+                return sendResponse(res, HTTP_STATUS.OK, "Successfully received the user", user);
             } else {
-                return res.status(HTTP_STATUS.OK).send(failure("User does not exist"));
+                return sendResponse(res, HTTP_STATUS.NO_CONTENT, "User does not exist");
             }
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
@@ -47,17 +42,13 @@ class UserController {
         try {
             const validation = validationResult(req).array();
             if (validation.length > 0) {
-                return res
-                    .status(HTTP_STATUS.OK)
-                    .send(failure("Failed to add the user", validation));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the user", validation);
             }
             const { name, rank, email, address, role } = req.body;
 
             const emailCheck = await UserModel.findOne({ email: email });
             if (emailCheck) {
-                return res
-                    .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
-                    .send(failure("User with email already exists"));
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "User with email already exists");
             }
             const user = await UserModel.create({
                 name: name,
@@ -73,18 +64,12 @@ class UserController {
                 },
             });
             if (user) {
-                return res
-                    .status(HTTP_STATUS.OK)
-                    .send(success("Successfully added the user", user));
+                return sendResponse(res, HTTP_STATUS.CREATED, "Successfully added the user", user);
             }
-            return res
-                .status(HTTP_STATUS.UNPROCESSABLE_ENTITY)
-                .send(failure("Failed to add the user"));
+            return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Failed to add the user");
         } catch (error) {
             console.log(error);
-            return res
-                .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
-                .send(failure("Internal server error"));
+            return sendResponse(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 }
