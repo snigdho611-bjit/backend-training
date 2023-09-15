@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const { success, failure, sendResponse } = require("../util/common");
+const { sendResponse } = require("../util/common");
 const UserModel = require("../model/User");
 const HTTP_STATUS = require("../constants/statusCodes");
 
