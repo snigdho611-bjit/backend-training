@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const Auth = require("../model/Auth");
 const User = require("../model/User");
 const jsonwebtoken = require("jsonwebtoken");
+const { sendResponse } = require("../util/common");
 
 class AuthController {
     async login(req, res) {
@@ -25,7 +26,7 @@ class AuthController {
         const jwt = jsonwebtoken.sign(responseAuth, process.env.SECRET_KEY, { expiresIn: "1h" });
 
         responseAuth.token = jwt;
-        return sendResponse(res, HTTP_STATUS.OK, "Successfully added product", newProduct);
+        return sendResponse(res, HTTP_STATUS.OK, "Successfully added user", responseAuth);
     }
 
     async signup(req, res) {

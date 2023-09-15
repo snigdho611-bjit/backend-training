@@ -1,4 +1,4 @@
-const { success, failure } = require("../util/common");
+const { success, failure, sendResponse } = require("../util/common");
 const TransactionModel = require("../model/Transaction");
 const CartModel = require("../model/Cart");
 const ProductModel = require("../model/Product");
@@ -42,6 +42,11 @@ class TransactionController {
             if (!cart) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "Cart was not found for this user");
             }
+
+            if (cart.products.length === 0) {
+                return sendResponse(res, HTTP_STATUS.UNPROCESSABLE_ENTITY, "Please add products to cart first");
+            }
+
             const productsList = cart.products.map((element) => {
                 return element.product;
             });

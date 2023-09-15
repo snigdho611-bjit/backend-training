@@ -79,7 +79,8 @@ class ProductController {
                     [sortParam]: sortOrder === "asc" ? 1 : -1,
                 })
                 .skip((page - 1) * limit)
-                .limit(limit ? limit : 100);
+                .limit(limit ? limit : 100)
+                .select("title price rating stock brand category thumbnail");
             if (products.length === 0) {
                 return sendResponse(res, HTTP_STATUS.NOT_FOUND, "No products were found");
             }
