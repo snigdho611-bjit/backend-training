@@ -6,9 +6,12 @@ const ProductRouter = require("./routes/Product");
 const TransactionRouter = require("./routes/Transaction");
 const AuthRouter = require("./routes/Auth");
 const CartRouter = require("./routes/Cart");
+const FileRouter = require("./routes/File");
 const dotenv = require("dotenv");
 const databaseConnection = require("./config/database");
 const path = require("path");
+const multer = require("multer");
+const { sendResponse } = require("./util/common");
 
 dotenv.config();
 
@@ -22,6 +25,24 @@ app.use("/transactions", TransactionRouter);
 app.use("/users", UserRouter);
 app.use("/auth", AuthRouter);
 app.use("/cart", CartRouter);
+app.use("/files", FileRouter);
+
+// CUSTOM ERROR HANDLER FOR MULTER
+app.use((err, req, res, next) => {
+    console.log(err);
+    if (err instanceof multer.MulterError) {
+        return sendResponse(res, 404, err.message);
+    } else {
+        next(err);
+    }
+});
+
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+        return sendResponse(res, 404, err.message);
+    }
+    next();
+});
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "./", "views"));
