@@ -1,0 +1,44 @@
+.forgotpassword {
+  display: grid;
+  grid-template-columns: 25% 75%;
+  width: 30%;
+  margin: 10rem auto;
+  row-gap: 0.5rem;
+  padding: 3rem 2rem;
+  background-color: #ddd6fe;
+  border-radius: 10px;
+  box-shadow: 2px 2px 3px 3px #5b21b6;
+  &_label {
+    text-align: end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  &_input {
+    padding: 0.25rem 0.5rem;
+  }
+  &_button {
+    grid-column: span 2;
+    width: 40%;
+    margin: 0 auto;
+    background-color: #5b21b6;
+    padding: 0.5rem 0.75rem;
+    border-radius: 5px;
+    color: #ddd6fe;
+  }
+  &_message {
+    height: 1.5rem;
+    grid-column: span 2;
+    text-align: center;
+  }
+  &_login {
+    color: purple;
+    grid-column: span 2;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.25s color;
+    &:hover {
+      color: fuchsia;
+    }
+  }
+}
