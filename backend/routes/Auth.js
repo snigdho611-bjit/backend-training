@@ -10,5 +10,8 @@ const { authValidator } = require("../middleware/validation");
 
 routes.post("/login", AuthController.login);
 routes.post("/sign-up", authValidator.signup, AuthController.signup);
+routes.post("/forgot-password", AuthController.sendForgotPasswordEmail);
+routes.get("/validate-password-reset-request/:token/:userId", AuthController.validatePasswordResetRequest);
+routes.post("/reset-password", AuthController.resetPassword);
 
 module.exports = routes;

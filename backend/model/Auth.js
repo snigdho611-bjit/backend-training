@@ -25,6 +25,21 @@ const authSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        resetPassword: {
+            type: Boolean || null,
+            required: false,
+            default: false,
+        },
+        resetPasswordToken: {
+            type: String || null,
+            required: false,
+            default: null,
+        },
+        resetPasswordExpire: {
+            type: Date || null,
+            required: false,
+            default: null,
+        },
     },
     { timestamps: true }
 );
