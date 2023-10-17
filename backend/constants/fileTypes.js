@@ -1,2 +1,2 @@
-const fileTypes = [".jpg", ".png", ".jpeg", ".txt"];
+const fileTypes = [".jpg", ".png", ".jpeg", ".txt", ".pdf"];
 module.exports = fileTypes;
